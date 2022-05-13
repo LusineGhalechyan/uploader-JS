@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./assets/styles.css" />
+    <title>Uploader</title>
+  </head>
+  <body>
+    <div class="uploader">
+      <div class="uploader__header">Drag & Drop File Here</div>
+      <input
+        type="file"
+        id="fileupload"
+        name="fileupload"
+        class="uploader__button--upload"
+        multiple
+      />
+      <button id="upload-button" class="uploader__button--transfer">
+        Files to Server
+      </button>
+      <progress max="100" value="1" class="uploader__progressBar">
+        Value %
+      </progress>
+    </div>
+
+    <script type="module" src="./script.js/index.js"></script>
+  </body>
+</html>

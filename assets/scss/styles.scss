@@ -1,0 +1,13 @@
+
+      .uploader {
+        width: 50%;
+        margin: 30px auto;
+        line-height: 150px;
+        text-align: center;
+        border: 1px dotted blue;
+        .uploader__header{
+          display: flex;
+          line-height: 100px;
+          justify-content: center;
+            }
+        }
