@@ -1,33 +1,55 @@
 import endPoint from "./endpoint.js";
 
 class Uploader {
-  static #api = `https://jsonplaceholder.typicode.com/posts`;
-
   constructor(options) {
-    this.options = {
-      ...options,
-    };
+    // this.options = {
+    //   ...options,
+    // };
+    this.formDataData = [];
+    this.activateDragAndDrop = function () {};
+  }
 
-    this.upload = function () {
-      var uploader = document.querySelector(".uploader");
-      var uploaderButton = document.querySelector(".uploader__button--upload");
-      var progressBar = document.querySelector(".uploader__button--upload");
+  // #api = `https://jsonplaceholder.typicode.com/posts`;
+  #api = endPoint;
+  #chunkSize = 3;
 
-      uploaderButton.addEventListener("click", function () {
-        var formData = new FormData();
+  static container = document.querySelector(".uploader");
+  static uploaderButton = Uploader.container.querySelector(
+    ".uploader__button--upload"
+  );
+  static transferButton = Uploader.container.querySelector(
+    ".uploader__button--transfer"
+  );
+  static progressBar = Uploader.container.querySelector(
+    ".uploader__progressBar"
+  );
 
-        formData.append("file", JSON.stringify(fileupload.files));
-        console.log(`FD`, formData.values());
+  upload() {
+    console.log(`cont`, Uploader.container);
+    Uploader.uploaderButton.addEventListener("click", () => {
+      var formData = new FormData();
 
-        for (let entry of formData.values()) {
-          console.log(`ENT`, entry);
-        }
+      formData.append("file", JSON.stringify(fileupload.files));
 
-        console.log(`f_data`, formData.get("file"));
+      for (let entry of formData.values()) {
+        this.formDataData.push(entry);
+        console.log(`ENT`, entry);
+      }
+    });
+  }
 
+  transfer() {
+    console.log(`FDATA_TRSF`, this.formDataData);
+
+    Uploader.transferButton.addEventListener("click", () => {
+      for (let i = 0; i < this.formDataData.length; i += this.#chunkSize) {
+        var chunk = this.formDataData.slice(i, i + this.#chunkSize);
+        console.log(`FDATA`, this.formDataData);
+        console.log(`CHUNK`, chunk);
         var request = new XMLHttpRequest();
-        request.open("POST", Uploader.#api);
-        request.send(formData);
+
+        request.open("POST", this.#api);
+        request.send(chunk);
 
         request.onload = function () {
           console.log(`Loaded: ${request.status} ${request.response}`);
@@ -43,20 +65,18 @@ class Uploader {
           var totalEvts = evt.total;
           var loadedEvts = evt.loaded;
 
-          console.log(`EVT`, evt);
-
           var calcPercent = (loadedEvts / totalEvts) * 100;
-
-          console.log(`VAL_`, progressBar);
         };
-      });
-    };
-    this.activateDragAndDrop = function () {};
+      }
+    });
+
+    // console.log(`f_data`, formData.get("file"));
   }
 }
 
 var uploader = new Uploader();
 uploader.upload();
+console.log("transf", uploader.transfer());
 
 // function onDragStart(evt) {}
 // function onDragOver(evt) {}
