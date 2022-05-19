@@ -6,6 +6,10 @@ class Uploader {
     //   ...options,
     // };
     this.formDataData = [];
+    // this.eventsArray = [
+    //   { actionType: "change", action: (evt) => this.upload(evt) },
+    //   { actionType: "click", action: (evt) => this.transfer(evt) },
+    // ];
     this.activateDragAndDrop = function () {};
   }
 
@@ -25,66 +29,54 @@ class Uploader {
       var formData = new FormData();
 
       formData.append("file", JSON.stringify(fileupload.files));
-      console.log(fileupload.files);
       for (let uploadedData of formData.values()) {
         this.formDataData.push(uploadedData);
-        // console.log(`ENT`, uploadedData);
       }
     });
-    // console.log(`FORM_DATA`, this.formDataData);
   }
 
   transfer() {
-    console.log(`FDATA_TRSF_INIT`, this.formDataData);
     var chunk = [];
     console.log(`CHUNK_INIT`, chunk);
+    Uploader.el(".uploader__button--transfer").addEventListener("click", () => {
+      // if (this.formDataData.length) {
+      //   this.formDataData = this.formDataData.filter((el) => el !== "{}");
+      // }
+      this.formDataData = Object.values(JSON.parse(this.formDataData));
 
-    Uploader.el(".uploader__button--transfer").addEventListener(
-      "click",
-      () => {
-        console.log(`FDATA_TRSF_FIN`, this.formDataData);
-        if (this.formDataData.length) {
-          this.formDataData = this.formDataData.filter((el) => el !== "{}");
-        }
+      for (let i = 0; i < this.formDataData.length; i += this.#chunkSize) {
+        chunk = this.formDataData.slice(i, i + this.#chunkSize);
+        console.log(`CHUNK_FIN`, chunk);
+        var request = new XMLHttpRequest();
 
-        // console.log(`F_DATA`, this.formDataData);
+        request.open("POST", this.#api);
+        request.send(chunk);
 
-        for (let i = 0; i < this.formDataData.length; i += this.#chunkSize) {
-          chunk = this.formDataData.slice(i, i + this.#chunkSize);
-          console.log(`FDATA`, this.formDataData);
-          console.log(`CHUNK_FIN`, chunk);
-          var request = new XMLHttpRequest();
+        request.onload = function () {
+          console.log(`Loaded: ${request.status} ${request.response}`);
+        };
 
-          request.open("POST", this.#api);
-          request.send(chunk);
+        request.onerror = function () {
+          alert(`‼ Failed to post data`);
+        };
 
-          request.onload = function () {
-            console.log(`Loaded: ${request.status} ${request.response}`);
-          };
-
-          request.onerror = function () {
-            alert(`‼ Failed to post data`);
-          };
-
-          request.onprogress = function (evt) {
-            // alert(`hi`);
-            evt.preventDefault();
-            var computedLength = evt.lengthComputable;
-            var totalEvts = evt.total;
-            var loadedEvts = evt.loaded;
-            console.log(`loadedEvts`, loadedEvts);
-            console.log(`totalEvts`, totalEvts);
-            if (computedLength) {
-              var loadedPercent = (loadedEvts / totalEvts) * 100;
-              Uploader.el(".uploader__progressBar").value = loadedPercent;
-              Uploader.el(
-                ".uploader__loadedTotal"
-              ).innerHTML = `${loadedPercent}%`;
-            }
-          };
-        }
+        request.onprogress = function (evt) {
+          evt.preventDefault();
+          var computedLength = evt.lengthComputable;
+          var totalEvts = evt.total;
+          var loadedEvts = evt.loaded;
+          console.log(`loadedEvts`, loadedEvts);
+          console.log(`totalEvts`, totalEvts);
+          if (computedLength) {
+            var loadedPercent = (loadedEvts / totalEvts) * 100;
+            Uploader.el(".uploader__progressBar").value = loadedPercent;
+            Uploader.el(
+              ".uploader__loadedTotal"
+            ).innerHTML = `${loadedPercent}%`;
+          }
+        };
       }
-    );
+    });
     // console.log(`f_data`, formData.get("file"));
   }
 }
