@@ -2,7 +2,7 @@ const _ENDPOINT = Symbol();
 
 class EndPoint {
   [_ENDPOINT] = () => {
-    return `http://192.168.0.102/uploader/`;
+    return `http://192.168.0.113/uploader/`;
   };
 }
 

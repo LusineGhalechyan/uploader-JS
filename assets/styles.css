@@ -8,3 +8,6 @@
     display: flex;
     line-height: 100px;
     justify-content: center; }
+  .uploader .uploader__loadedTotal {
+    height: 20px;
+    margin: 0; }

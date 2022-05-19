@@ -9,74 +9,89 @@ class Uploader {
     this.activateDragAndDrop = function () {};
   }
 
-  // #api = `https://jsonplaceholder.typicode.com/posts`;
-  #api = endPoint;
+  #api = `https://jsonplaceholder.typicode.com/posts`;
+  // #api = endPoint;
   #chunkSize = 3;
 
   static container = document.querySelector(".uploader");
-  static uploaderButton = Uploader.container.querySelector(
-    ".uploader__button--upload"
-  );
-  static transferButton = Uploader.container.querySelector(
-    ".uploader__button--transfer"
-  );
-  static progressBar = Uploader.container.querySelector(
-    ".uploader__progressBar"
-  );
+
+  static el(el) {
+    return Uploader.container.querySelector(el);
+  }
 
   upload() {
-    console.log(`cont`, Uploader.container);
-    Uploader.uploaderButton.addEventListener("click", () => {
+    // console.log(`cont`, Uploader.container);
+    Uploader.el(".uploader__button--upload").addEventListener("change", () => {
       var formData = new FormData();
 
       formData.append("file", JSON.stringify(fileupload.files));
-
-      for (let entry of formData.values()) {
-        this.formDataData.push(entry);
-        console.log(`ENT`, entry);
+      console.log(fileupload.files);
+      for (let uploadedData of formData.values()) {
+        this.formDataData.push(uploadedData);
+        // console.log(`ENT`, uploadedData);
       }
     });
+    // console.log(`FORM_DATA`, this.formDataData);
   }
 
   transfer() {
-    console.log(`FDATA_TRSF`, this.formDataData);
+    console.log(`FDATA_TRSF_INIT`, this.formDataData);
+    var chunk = [];
+    console.log(`CHUNK_INIT`, chunk);
 
-    Uploader.transferButton.addEventListener("click", () => {
-      for (let i = 0; i < this.formDataData.length; i += this.#chunkSize) {
-        var chunk = this.formDataData.slice(i, i + this.#chunkSize);
-        console.log(`FDATA`, this.formDataData);
-        console.log(`CHUNK`, chunk);
-        var request = new XMLHttpRequest();
+    Uploader.el(".uploader__button--transfer").addEventListener(
+      "click",
+      () => {
+        console.log(`FDATA_TRSF_FIN`, this.formDataData);
+        if (this.formDataData.length) {
+          this.formDataData = this.formDataData.filter((el) => el !== "{}");
+        }
 
-        request.open("POST", this.#api);
-        request.send(chunk);
+        // console.log(`F_DATA`, this.formDataData);
 
-        request.onload = function () {
-          console.log(`Loaded: ${request.status} ${request.response}`);
-        };
+        for (let i = 0; i < this.formDataData.length; i += this.#chunkSize) {
+          chunk = this.formDataData.slice(i, i + this.#chunkSize);
+          console.log(`FDATA`, this.formDataData);
+          console.log(`CHUNK_FIN`, chunk);
+          var request = new XMLHttpRequest();
 
-        request.onerror = function () {
-          alert(`‼ Failed to post data`);
-        };
+          request.open("POST", this.#api);
+          request.send(chunk);
 
-        request.onprogress = function (evt) {
-          evt.preventDefault();
-          // var computedLength = evt.lengthComputable;
-          var totalEvts = evt.total;
-          var loadedEvts = evt.loaded;
+          request.onload = function () {
+            console.log(`Loaded: ${request.status} ${request.response}`);
+          };
 
-          var calcPercent = (loadedEvts / totalEvts) * 100;
-        };
+          request.onerror = function () {
+            alert(`‼ Failed to post data`);
+          };
+
+          request.onprogress = function (evt) {
+            // alert(`hi`);
+            evt.preventDefault();
+            var computedLength = evt.lengthComputable;
+            var totalEvts = evt.total;
+            var loadedEvts = evt.loaded;
+            console.log(`loadedEvts`, loadedEvts);
+            console.log(`totalEvts`, totalEvts);
+            if (computedLength) {
+              var loadedPercent = (loadedEvts / totalEvts) * 100;
+              Uploader.el(".uploader__progressBar").value = loadedPercent;
+              Uploader.el(
+                ".uploader__loadedTotal"
+              ).innerHTML = `${loadedPercent}%`;
+            }
+          };
+        }
       }
-    });
-
+    );
     // console.log(`f_data`, formData.get("file"));
   }
 }
 
 var uploader = new Uploader();
 uploader.upload();
-console.log("transf", uploader.transfer());
+uploader.transfer();
 
 // function onDragStart(evt) {}
 // function onDragOver(evt) {}
