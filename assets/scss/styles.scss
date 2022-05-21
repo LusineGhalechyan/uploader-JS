@@ -4,7 +4,12 @@
         margin: 30px auto;
         line-height: 150px;
         text-align: center;
-        border: 1px dotted blue;
+        border: 2px dashed blue;
+        background: #f1f1f1;
+        padding: 20px;
+        &:hover{
+          background: #ddd;
+        }
         .uploader__header{
           display: flex;
           line-height: 100px;
