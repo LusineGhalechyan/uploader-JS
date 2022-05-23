@@ -9,19 +9,21 @@
   </head>
   <body>
     <div class="uploader">
-      <div class="uploader__header">Drag & Drop File Here</div>
-      <input
-        type="file"
-        id="fileupload"
-        name="fileupload"
-        class="uploader__button--upload"
-        multiple
-      />
-      <button id="upload-button" class="uploader__button--transfer">
-        Files to Server
-      </button>
-      <progress max="100" value="0" class="uploader__progressBar"></progress>
-      <span class="uploader__loadedTotal"></span>
+      <div class="uploader__content">
+        <div class="uploader__header">Drop file(s) Here or Upload file(s)</div>
+        <input
+          type="file"
+          id="fileupload"
+          name="fileupload"
+          class="uploader__button--upload"
+          multiple
+        />
+        <button id="upload-button" class="uploader__button--transfer">
+          Files to Server
+        </button>
+        <progress max="100" value="0" class="uploader__progressBar"></progress>
+        <span class="uploader__loadedTotal"></span>
+      </div>
     </div>
 
     <script type="module" src="./script/index.js"></script>
