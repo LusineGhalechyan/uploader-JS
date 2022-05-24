@@ -41,6 +41,7 @@ class Uploader {
 
   fileListItems(files) {
     var list = new DataTransfer();
+    console.log(`LIST`, list);
     for (var i = 0; i < files.length; i++) list.items.add(files[i]);
     return list.files;
   }
@@ -112,6 +113,7 @@ class Uploader {
         files.push(file);
       }
       this.formDataData = [...files];
+      fileupload.files = this.fileListItems(files);
     }
   }
 
