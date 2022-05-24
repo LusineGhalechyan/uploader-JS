@@ -114,6 +114,7 @@ class Uploader {
       }
       this.formDataData = [...files];
       fileupload.files = this.fileListItems(files);
+      this.enableReset();
     }
   }
 
@@ -127,12 +128,12 @@ class Uploader {
       this.dragOverHandler(evt);
       Uploader.el(".uploader__progressBar").value = 0;
     };
+
     Uploader.el(".uploader__content").ondrop = (evt) => this.dropHandler(evt);
 
     Uploader.el(".uploader__button--upload").onchange = (evt) => {
       Uploader.el(".uploader__progressBar").value = 0;
       if (fileupload.files.length) this.formDataData = [...fileupload.files];
-
       this.enableReset();
     };
   }
