@@ -3,16 +3,17 @@ import endPoint from "./endpoint.js";
 class Uploader {
   constructor() {
     this.formDataData = [];
+    // this.progressBars = [
+    //   Uploader.el("#bar0"),
+    //   Uploader.el("#bar1"),
+    //   Uploader.el("#bar2"),
+    // ];
+
     this.eventsArray = [
       {
-        className: ".uploader__button--upload",
+        className: ".uploader__button",
         actionType: "change",
         action: (evt) => Uploader.el(this.className).onchange(evt),
-      },
-      {
-        className: ".uploader__button--transfer",
-        actionType: "click",
-        action: (evt) => Uploader.el(this.className).onclick(evt),
       },
       {
         className: ".uploader__content",
@@ -41,22 +42,8 @@ class Uploader {
 
   fileListItems(files) {
     var list = new DataTransfer();
-    console.log(`LIST`, list);
     for (var i = 0; i < files.length; i++) list.items.add(files[i]);
     return list.files;
-  }
-
-  enableReset() {
-    if (this.formDataData.length) {
-      Uploader.el(".uploader__button--transfer").disabled = false;
-      Uploader.el(".uploader__progressBar").style.display = "none";
-      Uploader.el(".uploader__loadedTotal").innerHTML = "";
-    }
-  }
-
-  reset() {
-    Uploader.el(".uploader__button--transfer").disabled = true;
-    Uploader.el(".uploader__button--upload").value = "";
   }
 
   addMultipleListeners() {
@@ -103,97 +90,86 @@ class Uploader {
         }
       }
 
-      this.formDataData = [...files];
+      this.setUploadedData(files);
       fileupload.files = this.fileListItems(files);
-      this.enableReset();
     } else {
       // Use DataTransfer interface to access the file(s)
       for (var i = 0; i < fileDataFiles.length; i++) {
         var file = fileDataFiles[i].name;
         files.push(file);
       }
-      this.formDataData = [...files];
+
+      this.setUploadedData(files);
       fileupload.files = this.fileListItems(files);
-      this.enableReset();
     }
   }
 
-  upload() {
-    if (!this.formDataData.length) {
-      Uploader.el(".uploader__button--transfer").disabled = true;
-      Uploader.el(".uploader__progressBar").style.display = "none";
-    }
+  setUploadedData(files) {
+    if (files.length) this.formDataData = [...files];
+  }
 
+  handleChange() {
     Uploader.el(".uploader__content").ondragover = (evt) => {
       this.dragOverHandler(evt);
-      Uploader.el(".uploader__progressBar").value = 0;
     };
 
-    Uploader.el(".uploader__content").ondrop = (evt) => this.dropHandler(evt);
+    Uploader.el(".uploader__content").ondrop = (evt) => {
+      this.dropHandler(evt);
+      if (fileupload.files.length) {
+        // this.setUploadedData(fileupload.files);
+        this.uploadTransferFiles();
+      }
+    };
 
-    Uploader.el(".uploader__button--upload").onchange = (evt) => {
-      Uploader.el(".uploader__progressBar").value = 0;
-      if (fileupload.files.length) this.formDataData = [...fileupload.files];
-      this.enableReset();
+    Uploader.el(".uploader__button").onchange = () => {
+      if (fileupload.files.length) {
+        this.setUploadedData(fileupload.files);
+        this.uploadTransferFiles();
+      }
     };
   }
 
-  transfer() {
-    var chunk = [];
-    var promises = [];
+  uploadTransferFiles() {
+    var resetVal = 0;
 
-    Uploader.el(".uploader__button--transfer").onclick = (evt) => {
-      Uploader.el(".uploader__progressBar").style.display = "inline-flex";
+    for (let i = 0; i < this.formDataData.length; i++) {
+      var xhr = new XMLHttpRequest();
+      xhr.index = i;
+      xhr.upload.onprogress = (evt) => {
+        var loadedEvts = evt.loaded;
+        var totalEvts = evt.total;
+        var calcPercent = (loadedEvts / totalEvts) * 100;
 
-      for (let i = 0; i < this.formDataData.length; i += this.#chunkSize) {
-        chunk = this.formDataData.slice(i, i + this.#chunkSize);
-        promises.push(
-          new Promise((resolve, reject) => {
-            var request = new XMLHttpRequest();
+        Uploader.el(`#percent${i % this.#chunkSize}`).innerHTML = `${Math.round(
+          calcPercent
+        )}%`;
 
-            request.open("POST", this.#api);
-            request.send(chunk);
+        Uploader.el(`#bar${i % this.#chunkSize}`).value = calcPercent;
+      };
 
-            request.onload = function () {
-              request.status > 200 && request.status < 300
-                ? resolve(request.response)
-                : reject(request.statusText);
-            };
+      xhr.upload.onloadend = (evt) => {
+        console.log(`COND`, i + 1);
+        if (
+          (i + 1) % this.#chunkSize === 0 &&
+          i !== this.formDataData.length - 1
+        ) {
+          Uploader.el("#bar0").value = resetVal;
+          Uploader.el("#bar1").value = resetVal;
+          Uploader.el("#bar2").value = resetVal;
 
-            request.onerror = function () {
-              reject(request.statusText);
-            };
+          Uploader.el("#percent0").innerHTML = `${resetVal}%`;
+          Uploader.el("#percent1").innerHTML = `${resetVal}%`;
+          Uploader.el("#percent2").innerHTML = `${resetVal}%`;
+        }
+      };
 
-            var loadedPercent =
-              (1 / Math.ceil(this.formDataData.length / this.#chunkSize)) * 100;
-            if (loadedPercent) {
-              var newValue =
-                Uploader.el(".uploader__progressBar").value + loadedPercent;
-              Uploader.el(".uploader__progressBar").value = newValue;
-              Uploader.el(".uploader__loadedTotal").innerHTML = `${Math.round(
-                newValue
-              )}%`;
-            }
-          })
-        );
-      }
-
-      Promise.all(promises)
-        .then((responses) => {
-          if (responses) {
-            this.reset();
-          }
-        })
-        .catch((err) => {
-          alert("Error in transfering data", err);
-          this.reset();
-        });
-    };
+      xhr.open("POST", this.#api);
+      xhr.send([this.formDataData[i]]);
+    }
   }
 }
 
 var uploader = new Uploader();
 
-uploader.upload();
-uploader.transfer();
+uploader.handleChange();
 uploader.destroyEventListeners();

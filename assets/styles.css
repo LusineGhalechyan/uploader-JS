@@ -1,7 +1,7 @@
 .uploader {
   width: 50%;
   margin: 30px auto;
-  line-height: 150px;
+  line-height: 50px;
   text-align: center;
   border: 2px dashed blue;
   background: #f1f1f1;
@@ -12,6 +12,12 @@
     display: flex;
     line-height: 100px;
     justify-content: center; }
-  .uploader .uploader__loadedTotal {
-    height: 20px;
-    margin: 0; }
+  .uploader .uploader__button {
+    margin: auto;
+    text-align: center;
+    transform: translateX(30px); }
+  .uploader .progressBar__progress {
+    margin: auto;
+    display: inline-block; }
+  .uploader .progressBar__percent {
+    display: inline-block; }

@@ -15,14 +15,38 @@
           type="file"
           id="fileupload"
           name="fileupload"
-          class="uploader__button--upload"
+          class="uploader__button"
           multiple
         />
-        <button id="upload-button" class="uploader__button--transfer">
-          Files to Server
-        </button>
-        <progress max="100" value="0" class="uploader__progressBar"></progress>
-        <span class="uploader__loadedTotal"></span>
+        <div class="progressBar">
+          <div class="progressBar__item">
+            <progress
+              max="100"
+              value="0"
+              class="progressBar__progress"
+              id="bar0"
+            ></progress>
+            <span id="percent0" class="progressBar__percent"></span>
+          </div>
+          <div class="progressBar__item">
+            <progress
+              max="100"
+              value="0"
+              class="progressBar__progress"
+              id="bar1"
+            ></progress>
+            <span id="percent1" class="progressBar__percent"></span>
+          </div>
+          <div class="progressBar__item">
+            <progress
+              max="100"
+              value="0"
+              class="progressBar__progress"
+              id="bar2"
+            ></progress>
+            <span id="percent2" class="progressBar__percent"></span>
+          </div>
+        </div>
       </div>
     </div>
 

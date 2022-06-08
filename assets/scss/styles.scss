@@ -1,22 +1,29 @@
-
-      .uploader {
-        width: 50%;
-        margin: 30px auto;
-        line-height: 150px;
-        text-align: center;
-        border: 2px dashed blue;
-        background: #f1f1f1;
-        padding: 20px;
-        &:hover{
-          background: #ddd;
-        }
-        .uploader__header{
-          display: flex;
-          line-height: 100px;
-          justify-content: center;
-            }
-            .uploader__loadedTotal{
-              height: 20px;
-              margin: 0;
-            }
-        }
+.uploader {
+  width: 50%;
+  margin: 30px auto;
+  line-height: 50px;
+  text-align: center;
+  border: 2px dashed blue;
+  background: #f1f1f1;
+  padding: 20px;
+  &:hover{
+      background: #ddd;
+ }
+  .uploader__header{
+      display: flex;
+      line-height: 100px;
+      justify-content: center;
+ }
+  .uploader__button{
+      margin: auto;
+      text-align: center;
+      transform: translateX(30px) ;
+ }
+  .progressBar__progress {
+      margin: auto;
+      display: inline-block;
+ }
+  .progressBar__percent{
+      display: inline-block;
+ }
+}
